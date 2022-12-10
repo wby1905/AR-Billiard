@@ -1,0 +1,11 @@
+Model Information:
+* title:	Billiard Concept
+* source:	https://sketchfab.com/3d-models/billiard-concept-15582d113ced44c4ad308aba2d9cefee
+* author:	Nilay Dindar (https://sketchfab.com/ucanpenguen)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Billiard Concept" (https://sketchfab.com/3d-models/billiard-concept-15582d113ced44c4ad308aba2d9cefee) by Nilay Dindar (https://sketchfab.com/ucanpenguen) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

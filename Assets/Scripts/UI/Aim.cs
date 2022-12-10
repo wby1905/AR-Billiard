@@ -30,8 +30,8 @@ public class Aim : MonoBehaviour
     void Update()
     {
         aimPoint.position = cueBallAim.transform.position - cueBall.transform.position + stick.aimPoint.position;
-        aimPoint.up = stick.transform.up;
-        degree.text = (90 - Vector3.Angle(stick.transform.up, Vector3.up)).ToString("0.0") + "°";
+        aimPoint.up = -stick.transform.forward;
+        degree.text = (90 - Vector3.Angle(-stick.transform.forward, Vector3.up)).ToString("0.0") + "°";
     }
 
     void FixedUpdate()

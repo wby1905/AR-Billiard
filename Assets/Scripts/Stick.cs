@@ -8,7 +8,7 @@ public class Stick : MonoBehaviour
     public float endDistance = 0.5f;
 
     Vector3 prevPosition;
-    float _speed;
+    Vector3 _speed;
     public float _forceFactor = 500f;
     public float _fadeTime = 1f;
     float _timer = 0f;
@@ -18,6 +18,7 @@ public class Stick : MonoBehaviour
     private AudioSource _audioSource;
 
     private LineRenderer _line;
+
 
     public Aim aim;
     public Transform aimPoint;
@@ -29,7 +30,7 @@ public class Stick : MonoBehaviour
     void Start()
     {
         prevPosition = transform.position;
-        _speed = 0f;
+        _speed = Vector3.zero;
         _initScale = transform.lossyScale;
         _audioSource = GetComponent<AudioSource>();
         _line = GetComponent<LineRenderer>();
@@ -41,7 +42,7 @@ public class Stick : MonoBehaviour
         aim.gameObject.SetActive(false);
         aimPoint.gameObject.SetActive(false);
         _line.enabled = false;
-        _speed = 0f;
+        _speed = Vector3.zero;
         prevPosition = Vector3.zero;
         GetComponent<Collider>().enabled = false;
         GetComponent<MeshRenderer>().enabled = false;
@@ -76,30 +77,31 @@ public class Stick : MonoBehaviour
             activate();
             drawAimLine();
             float remap = 0f;
-            float curRadius = radius * (transform.lossyScale.x / _initScale.x);
+            float scale = (transform.lossyScale.x / _initScale.x);
+            float curRadius = radius * scale;
             if (!_isLocked)
             {
                 Ray ray = new Ray(end.position, start.position - end.position);
-                transform.position = ray.GetPoint(endDistance);
-                transform.up = start.position - end.position;
+                transform.position = ray.GetPoint(endDistance * scale);
+                transform.forward = -(start.position - end.position);
             }
             else
             {
-                Vector3 reproject = Vector3.Project(start.position - end.position, transform.up);
+                Vector3 reproject = Vector3.Project(start.position - end.position, -transform.forward);
                 Vector3 vertical = reproject - (start.position - end.position);
                 remap = Mathf.Clamp(vertical.magnitude, 0f, curRadius * 10f) / 10f;
 
                 Vector3 offset = ((start.position - _lockedPosition) - reproject);
                 offset *= 3f;
                 transform.position = start.position - reproject +
-                (vertical.normalized * remap + reproject.normalized * endDistance) + offset;
+                (vertical.normalized * remap + reproject.normalized * endDistance * scale) + offset;
 
             }
-            Ray rayToBall = new Ray(transform.position, transform.up);
+            Ray rayToBall = new Ray(transform.position, -transform.forward);
             float dis = Mathf.Sqrt(Mathf.Pow(curRadius, 2) - Mathf.Pow(remap, 2));
             float dis2 = Mathf.Sqrt(Mathf.Pow(Vector3.Distance(transform.position, start.position), 2) - Mathf.Pow(remap, 2));
-            aimPoint.position = rayToBall.GetPoint((dis2 - dis - 0.02f) * (transform.lossyScale.x / _initScale.x));
-            aimPoint.up = transform.up;
+            aimPoint.position = rayToBall.GetPoint((dis2 - dis));
+            aimPoint.up = -transform.forward;
         }
         else
         {
@@ -112,11 +114,11 @@ public class Stick : MonoBehaviour
     {
         if (prevPosition != Vector3.zero)
         {
-            _speed = (transform.position - prevPosition).magnitude / Time.fixedDeltaTime;
+            _speed = (transform.position - prevPosition) / Time.fixedDeltaTime;
         }
         else
         {
-            _speed = 0f;
+            _speed = Vector3.zero;
         }
         prevPosition = transform.position;
 
@@ -128,12 +130,12 @@ public class Stick : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.layer == LayerMask.NameToLayer("CueBall") && _timer <= 0f && _speed > 0.02f)
+        if (other.gameObject.layer == LayerMask.NameToLayer("CueBall") && _timer <= 0f && _speed.magnitude > 0.02f && _isLocked && !HasShot())
         {
 
             // ToDO Currently there is no torque Don't know why AddForceAtPosition is not working
-            other.gameObject.GetComponent<Rigidbody>().AddForceAtPosition(transform.up * _speed * _forceFactor, other.ClosestPoint(transform.position), ForceMode.Impulse);
-            _audioSource.volume = _speed * 0.5f;
+            other.gameObject.GetComponent<Rigidbody>().AddForceAtPosition(_speed / Time.fixedDeltaTime * _forceFactor, other.ClosestPoint(transform.position), ForceMode.Force);
+            _audioSource.volume = _speed.magnitude * 0.3f;
             _audioSource.Play();
             deactivate();
             _timer = _fadeTime;
@@ -148,7 +150,8 @@ public class Stick : MonoBehaviour
 
     bool canInstantiate()
     {
-        return endDistance * 2 < Vector3.Distance(start.position, end.position) && end.position.y > start.position.y - 0.05f;
+        float scale = (transform.lossyScale.x / _initScale.x);
+        return endDistance * scale * 2 < Vector3.Distance(start.position, end.position) && end.position.y > start.position.y - 0.05f;
     }
 
     void drawAimLine()
