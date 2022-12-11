@@ -107,7 +107,7 @@ public class Stick : MonoBehaviour, IMixedRealityInputActionHandler
             Ray rayToBall = new Ray(transform.position, -transform.forward);
             float dis = Mathf.Sqrt(Mathf.Pow(curRadius, 2) - Mathf.Pow(remap, 2));
             float dis2 = Mathf.Sqrt(Mathf.Pow(Vector3.Distance(transform.position, start.position), 2) - Mathf.Pow(remap, 2));
-            aimPoint.position = rayToBall.GetPoint((dis2 - dis - 0.01f * scale));
+            aimPoint.position = rayToBall.GetPoint((dis2 - dis - 0.005f * scale));
             aimPoint.up = -transform.forward;
 
             drawAimLine();
