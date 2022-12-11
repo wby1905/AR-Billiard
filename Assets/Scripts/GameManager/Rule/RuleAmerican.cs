@@ -240,7 +240,7 @@ public class RuleAmerican : Rule
         if (player1List.Length == 0 && player2List.Length == 0) result = "EveryBall";
         if (list == shixing) result = "Solids";
         if (list == huaqiu) result = "Stripes";
-        if (prevFoul) result += "\n (Shot Twice)";
+        if (prevFoul) result += " (Shot Twice)";
         return result;
     }
 }

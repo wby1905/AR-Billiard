@@ -136,10 +136,10 @@ public class GameManager : MonoBehaviour
         }
     }
 
+
     public void ResetGame()
     {
-        _sceneSystem.LoadContent("ARPoolGame", LoadSceneMode.Single);
-        // SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        _sceneSystem.UnloadContent("ARPoolGame");
     }
 
 }
