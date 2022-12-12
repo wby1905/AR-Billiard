@@ -1,4 +1,3 @@
-
 using Microsoft.MixedReality.Toolkit.Input;
 using Microsoft.MixedReality.Toolkit.Utilities;
 using Microsoft.MixedReality.Toolkit.Utilities.Solvers;
@@ -30,6 +29,11 @@ public class Stick : MonoBehaviour, IMixedRealityInputActionHandler
     private bool _isLocked = false;
     private Vector3 _lockedPosition;
     private Vector3 _initScale;
+    public float scale;
+
+    public Transform startPoint;
+    private bool _isShortened = false;
+
     void Start()
     {
         prevPosition = transform.position;
@@ -74,6 +78,7 @@ public class Stick : MonoBehaviour, IMixedRealityInputActionHandler
         aim.ResetTip();
     }
 
+
     // Update is called once per frame
     void Update()
     {
@@ -81,14 +86,16 @@ public class Stick : MonoBehaviour, IMixedRealityInputActionHandler
         {
             activate();
             float remap = 0f;
-            float scale = (transform.lossyScale.x / _initScale.x);
+            scale = (transform.lossyScale.x / _initScale.x);
             float curRadius = radius * scale;
             if (!_isLocked)
             {
                 Ray ray = new Ray(end.position, start.position - end.position);
                 transform.position = ray.GetPoint(endDistance * scale);
                 transform.forward = -(start.position - end.position);
+
             }
+
             else
             {
                 Vector3 reproject = Vector3.Project(start.position - end.position, -transform.forward);
@@ -104,6 +111,23 @@ public class Stick : MonoBehaviour, IMixedRealityInputActionHandler
                 }
 
             }
+
+            if (Vector3.Dot(startPoint.position - aim.cueBall.transform.position, transform.forward) < 0f && _speed.magnitude < 2f)
+            {
+                Ray ray = new Ray(transform.position, -transform.forward);
+                transform.position = ray.GetPoint(-Vector3.Distance(startPoint.position, aim.cueBall.transform.position) - 0.05f * scale);
+                _isShortened = true;
+            }
+            else
+            {
+                if (_isShortened)
+                {
+                    _speed = Vector3.zero;
+                    prevPosition = Vector3.zero;
+                }
+                _isShortened = false;
+            }
+
             Ray rayToBall = new Ray(transform.position, -transform.forward);
             float dis = Mathf.Sqrt(Mathf.Pow(curRadius, 2) - Mathf.Pow(remap, 2));
             float dis2 = Mathf.Sqrt(Mathf.Pow(Vector3.Distance(transform.position, start.position), 2) - Mathf.Pow(remap, 2));
@@ -111,7 +135,6 @@ public class Stick : MonoBehaviour, IMixedRealityInputActionHandler
             aimPoint.up = -transform.forward;
 
             drawAimLine();
-
         }
         else
         {
@@ -122,15 +145,18 @@ public class Stick : MonoBehaviour, IMixedRealityInputActionHandler
 
     void FixedUpdate()
     {
-        if (prevPosition != Vector3.zero)
+        if (_isLocked)
         {
-            _speed = (transform.position - prevPosition) / Time.fixedDeltaTime;
+            if (prevPosition != Vector3.zero)
+                _speed = (transform.position - prevPosition) / Time.fixedDeltaTime;
+            prevPosition = transform.position;
         }
         else
         {
             _speed = Vector3.zero;
+            // Debug.Log(Vector3.Dot(startPoint.position - aim.cueBall.transform.position, transform.forward));
+            prevPosition = Vector3.zero;
         }
-        prevPosition = transform.position;
 
         if (_timer > 0f)
         {
@@ -140,7 +166,9 @@ public class Stick : MonoBehaviour, IMixedRealityInputActionHandler
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.layer == LayerMask.NameToLayer("CueBall") && _timer <= 0f && _speed.magnitude > 0.02f && _isLocked && !HasShot())
+        if (Vector3.Dot(transform.forward, _speed) > 0f) return;
+        if (other.gameObject.layer == LayerMask.NameToLayer("CueBall") &&
+        _timer <= 0f && _speed.magnitude > 0.02f && _isLocked && !HasShot())
         {
 
             // ToDO Currently there is no torque Don't know why AddForceAtPosition is not working

@@ -23,7 +23,11 @@ public class Aim : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        aimPoint.position = cueBallAim.transform.position - cueBall.transform.position + stick.aimPoint.position;
+        aimPoint.position = cueBallAim.transform.position - (cueBall.transform.position - stick.aimPoint.position) * radius / (stick.radius * stick.scale);
+        if (Vector3.Distance(aimPoint.position, cueBallAim.transform.position) > radius + 0.05f)
+        {
+            aimPoint.position = Vector3.zero;
+        }
         aimPoint.up = -stick.transform.forward;
         degree.text = (-90 + Vector3.Angle(-stick.transform.forward, Vector3.up)).ToString("0.0") + "°";
     }

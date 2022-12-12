@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.SceneSystem;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -12,7 +13,7 @@ public class SceneLoader : MonoBehaviour
     void Start()
     {
         _sceneSystem = MixedRealityToolkit.Instance.GetService<IMixedRealitySceneSystem>();
-        _sceneSystem.LoadContent("ARPoolGame", LoadSceneMode.Single);
+        _sceneSystem.Initialize();
 
     }
 
