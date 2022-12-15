@@ -23,8 +23,12 @@ public class Aim : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        aimPoint.position = cueBallAim.transform.position - (cueBall.transform.position - stick.aimPoint.position) * radius / (stick.radius * stick.scale);
-        if (Vector3.Distance(aimPoint.position, cueBallAim.transform.position) > radius + 0.05f)
+        Vector3 pos = cueBallAim.transform.position - (cueBall.transform.position - stick.aimPoint.position) * radius / (stick.radius * stick.scale);
+        if (Vector3.Distance(pos, cueBallAim.transform.position) < radius + 0.05f)
+        {
+            aimPoint.position = pos;
+        }
+        else
         {
             aimPoint.position = Vector3.zero;
         }

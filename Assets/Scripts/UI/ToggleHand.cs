@@ -30,7 +30,7 @@ public class ToggleHand : MonoBehaviour
         {
             startPoint.TrackedTargetType = TrackedObjectType.HandJoint;
             startPoint.TrackedHandedness = Handedness.Left;
-            startPoint.TrackedHandJoint = TrackedHandJoint.IndexMiddleJoint;
+            startPoint.TrackedHandJoint = TrackedHandJoint.ThumbProximalJoint;
 
         }
         else

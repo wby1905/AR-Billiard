@@ -19,7 +19,7 @@ public class SceneLoader : MonoBehaviour
 
     void Update()
     {
-        if (!_sceneSystem.IsContentLoaded("ARPoolGame"))
+        if (!_sceneSystem.IsContentLoaded("ARPoolGame") && _sceneSystem.SceneOperationInProgress == false)
         {
             _sceneSystem.LoadContent("ARPoolGame", LoadSceneMode.Single);
         }

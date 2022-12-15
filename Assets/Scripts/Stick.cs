@@ -34,6 +34,8 @@ public class Stick : MonoBehaviour, IMixedRealityInputActionHandler
     public Transform startPoint;
     private bool _isShortened = false;
 
+    public GameObject settings;
+
     void Start()
     {
         prevPosition = transform.position;
@@ -82,6 +84,10 @@ public class Stick : MonoBehaviour, IMixedRealityInputActionHandler
     // Update is called once per frame
     void Update()
     {
+        if (start.GetComponent<SolverHandler>().TrackedTargetType == TrackedObjectType.CustomOverride)
+        {
+            endDistance /= 2f;
+        }
         if ((canInstantiate() || (_isLocked && _line.enabled == true)) && _timer <= 0f && !hasShot)
         {
             activate();
@@ -100,11 +106,13 @@ public class Stick : MonoBehaviour, IMixedRealityInputActionHandler
             {
                 Vector3 reproject = Vector3.Project(start.position - end.position, -transform.forward);
                 Vector3 vertical = reproject - (start.position - end.position);
+                // This is the remapped distance on the vertical plane of the stick.
                 remap = Mathf.Clamp(vertical.magnitude, 0f, curRadius * 10f) / 10f;
+                transform.position = start.position - reproject;
+                // To make it easier to shoot, we may also want to add an offset to current position.
+                // TODO
+
                 // single hand
-                Vector3 offset = ((start.position - _lockedPosition) - reproject);
-                offset *= 3f;
-                transform.position = start.position - reproject + offset;
                 if (start.GetComponent<SolverHandler>().TrackedTargetType == TrackedObjectType.CustomOverride)
                 {
                     transform.position += (vertical.normalized * remap + reproject.normalized * endDistance * scale);
@@ -217,7 +225,7 @@ public class Stick : MonoBehaviour, IMixedRealityInputActionHandler
         _line.SetPosition(1, hit.point);
         _line.startWidth = 0.001f;
         _line.endWidth = 0.005f;
-        if (hit.collider.gameObject.layer == LayerMask.NameToLayer("CueBall"))
+        if (hit.collider != null && hit.collider.gameObject.layer == LayerMask.NameToLayer("CueBall"))
         {
             _line.startColor = Color.red;
             _line.endColor = Color.red;
@@ -235,6 +243,7 @@ public class Stick : MonoBehaviour, IMixedRealityInputActionHandler
         if (eventData.InputSource.SourceName.Contains("Right"))
         {
             Lock();
+            settings.SetActive(false);
         }
     }
 
@@ -243,6 +252,7 @@ public class Stick : MonoBehaviour, IMixedRealityInputActionHandler
         if (eventData.InputSource.SourceName.Contains("Right"))
         {
             Unlock();
+            settings.SetActive(true);
         }
 
     }
