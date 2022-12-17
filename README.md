@@ -4,6 +4,17 @@ This project follows MIT LICENSE.
 
 Created with MRTK 2.8 and 2021.3.10f1
 
+Demo: 
+https://www.youtube.com/watch?v=-ZDgUf9-dPM
++ Adjust:
+![Adjust](imgs/Adjust.gif)
++ Shoot with Single Hand:
+![Single](imgs/Single.gif)
++ Shoot with Two Hands:
+![Both](imgs/Both.gif)
++ Adjust Cue Ball:
+![CueBall](imgs/CueBall.gif)
+
 # How to run:
 After Download the whole project, you can open Unity editor with the specific version. If you want to run it in the editor, you need to add two scenes in `/scene` folder, which is `ARPoolGame` scene and `Manager` scene. Then you can hit the play button to run it.
 
